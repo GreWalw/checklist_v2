@@ -2,6 +2,13 @@ import * as React from 'react';
 import { Button, View, Text } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
+import {
+  init,
+  addContent,
+  updateContent,
+  deleteContent,
+  fetchAllContent,
+} from './database/db';
 
 function HomeScreen({ navigation }) {
     return (
@@ -11,7 +18,6 @@ function HomeScreen({ navigation }) {
         <Button onPress={() => navigation.navigate('Groceries')} title="Groceries" />
         <Button onPress={() => navigation.navigate('To-Do')} title="To-Do" />
         <Button onPress={() => navigation.navigate('Miscellaneous')} title="Miscellaneous" />
-        <Button onPress={() => navigation.toggleDrawer()} title="Open/Close" />
       </View>
     );
   }
