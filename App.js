@@ -8,8 +8,18 @@ import CleaningScreen from './components/CleaningScreen';
 import GroceriesScreen from './components/GroceriesScreen';
 import TodoScreen from './components/TodoScreen';
 import MiscScreen from './components/MiscScreen';
+import {
+  init,
+  fetchAllContent,
+} from './database/db';
 
-
+init()
+  .then(() => {
+    console.log('Database creation succeeded!');
+  })
+  .catch(err => {
+    console.log('Database IS NOT initialized! ' + err);
+  });
 
 const Drawer = createDrawerNavigator();
 
