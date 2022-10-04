@@ -8,7 +8,7 @@ var db = openDatabase({ name: 'checklist.db' });
 export const init=(tableName)=>{
     const promise=new Promise((resolve, reject)=>{
         db.transaction((tx)=>{
-            //tx.executeSql('DROP TABLE IF EXISTS '+tableName+'', []); //uncomment this if needed - sometimes it is good to empty the table
+            tx.executeSql('DROP TABLE IF EXISTS '+tableName+'', []); //uncomment this if needed - sometimes it is good to empty the table
             //By default, primary key is auto_incremented - we do not add anything to that column
             tx.executeSql('create table if not exists '+tableName+'(id integer not null primary key, tablename text not null, content text not null, done int not null);',
             [],//second parameters of execution:empty square brackets - this parameter is not needed when creating table
@@ -56,14 +56,16 @@ export const updateContent=(tableName, id, content, done)=>{
             //Here we use the Prepared statement, just putting placeholders to the values to be inserted
             tx.executeSql('update '+tableName+' set content=?, done=? where id=?;',
             //And the values come here
-            [tableName, content, done, id],
+            [content, done, id],
             //If the transaction succeeds, this is called
             ()=>{
                     resolve();
+                    console.log("db resolve");
             },
             //If the transaction fails, this is called
             (_,err)=>{
                 reject(err);
+                console.log("db erroria");
             }
             );
         });
@@ -76,7 +78,7 @@ export const deleteContent=(tableName, id)=>{
             //Here we use the Prepared statement, just putting placeholders to the values to be inserted
             tx.executeSql('delete from '+tableName+' where id=?;',
             //And the values come here
-            [tableName, id],
+            [id],
             //If the transaction succeeds, this is called
             ()=>{
                     resolve();
