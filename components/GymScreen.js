@@ -14,6 +14,7 @@ init(table)
     console.log('Database IS NOT initialized! ' + err);
   });
 
+
   //TÄMÄ KOKO SIVU ON KESKEN, ADD-FUNKTIO ON ALUSTETTU JA SEN PITÄISI TOIMIA PERUSTASOLLA!
 function GymScreen({ navigation }) {
 
@@ -48,7 +49,6 @@ async function sendContent(){
         <Button title="Add" onPress={() => sendContent()} />
         <Text>Gym screen placeholder</Text>
         <Button onPress={() => navigation.goBack()} title="Back" />
-        <Button onPress={() => navigation.toggleDrawer()} title="Open/Close" />
       </View>
     );
   }
