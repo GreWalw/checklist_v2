@@ -70,6 +70,27 @@ export const updateContent=(tableName, id, content, done)=>{
     });
     return promise;
 };
+export const refreshDone=(tableName, done)=>{
+    const promise=new Promise((resolve, reject)=>{
+        db.transaction((tx)=>{
+            //Here we use the Prepared statement, just putting placeholders to the values to be inserted
+            tx.executeSql('update '+tableName+' set done=?;',
+            //And the values come here
+            [done],
+            //If the transaction succeeds, this is called
+            ()=>{
+                    resolve("Success.");
+            },
+            //If the transaction fails, this is called
+            (_,err)=>{
+                reject(err);
+                console.log("Error db 87");
+            }
+            );
+        });
+    });
+    return promise;
+};
 export const deleteContent=(tableName, id)=>{
     const promise=new Promise((resolve, reject)=>{
         db.transaction((tx)=>{
