@@ -3,7 +3,7 @@ import {useState} from 'react';
 import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 var table="Miscellaneous";
@@ -118,6 +118,24 @@ async function setAllDone(){
   }
 }
 
+async function setItemDone(id){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    console.log(done);
+    const dbResult = await checkItemDone(table, done, itemList[id].id);
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+  }
+}
+
 async function readAllContent(id) {
   try {
     const dbResult = await fetchAllContent(table);
@@ -137,6 +155,7 @@ const renderContent = ({item, index}) => {
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
+      onPress={()=>setItemDone(index, item.id)}
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
