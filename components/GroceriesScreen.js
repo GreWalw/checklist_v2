@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {useState} from 'react';
-import { Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, init } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, init } from '../database/db';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 var table="Groceries";
 var done=0;
@@ -31,6 +32,18 @@ const contentInputHandler = enteredText => {
   setContent(enteredText);
 };
 
+const renderRightActions = (id) => {
+  return (
+    <View style={styles.swipedRow}>
+      <Animated.View style={[styles.deleteButton]}>
+        <TouchableOpacity onPress={()=>deleteItem(id)} key={id}>
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+};
+
 async function sendContent(){
   try {
     console.log("app 22");
@@ -49,6 +62,19 @@ const updateItem = id => {
   setUpdateId(itemList[id].id);
   setContent(itemList[id].content);
 };
+
+async function deleteItem(id){
+  try{
+    const dbResult = await deleteContent(table, id);
+    readAllContent();
+  }
+  catch(err){
+    console.log(err);
+  }
+  finally{
+    //No need to do anything
+  }
+}
 
 async function updateContentInDb() {
   try {
@@ -78,6 +104,7 @@ async function readAllContent(id) {
 
 const renderContent = ({item, index}) => {
   return (
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
@@ -88,6 +115,7 @@ const renderContent = ({item, index}) => {
         </Text>
       </View>
     </TouchableOpacity>
+    </Swipeable>
   );
 };
 
@@ -125,6 +153,10 @@ const renderContent = ({item, index}) => {
       padding: 5,
       width: '50%',
     },
+    deleteButtonText: {
+      backgroundColor: "red",
+      color: "white",
+    }
   });
 
   export default GroceriesScreen;
