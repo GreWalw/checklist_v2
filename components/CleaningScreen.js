@@ -3,7 +3,7 @@ import {useState} from 'react';
 import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone, fetchAllDoneContent } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 var table="Cleaning";
@@ -25,6 +25,7 @@ function CleaningScreen({ navigation }) {
 
 const [content, setContent] = useState('');
 const [itemList, setItemList] = useState([]);
+const [doneItemList, setDoneItemList] = useState([]);
 const [updateID, setUpdateId] = useState(-1);
 //const [done, setDone] = useState();
 
@@ -100,7 +101,8 @@ async function refresh(){
   } catch (err) {
     console.log(err);
   } finally {
-    //No need to do anything
+    readAllContent();
+    readAllDoneContent();
   }
 }
 async function setAllDone(){
@@ -115,6 +117,8 @@ async function setAllDone(){
     console.log(err);
   } finally {
     done=0;
+    readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -148,6 +152,19 @@ async function readAllContent(id) {
     console.log('All read');
   }
 }
+async function readAllDoneContent() {
+  try {
+    const dbResult = await fetchAllDoneContent(table);
+    console.log('dbResult readAllDoneContent in GymScreen.js');
+    console.log(dbResult);
+    setDoneItemList(dbResult);
+  } catch (err) {
+    console.log('Erroria pukkaa done: ' + err);
+  } finally {
+    console.log('All read');
+  }
+}
+
 
 const renderContent = ({item, index}) => {
   return (
@@ -159,7 +176,7 @@ const renderContent = ({item, index}) => {
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
-          no:{index} content:{item.content}
+          {item.content}
         </Text>
       </View>
     </TouchableOpacity>
@@ -169,16 +186,24 @@ const renderContent = ({item, index}) => {
 
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-               <Text style={styles.textStyle}>CLEANING DAY !</Text>
+               <Text style={styles.textStyle}>CLEANING DAY!</Text>
         <FlatList
           style={styles.flatliststyle}
           keyExtractor={keyHandler}
           data={itemList}
           renderItem={renderContent}
         />
+        <Text style={styles.textStyle}>________________________________________</Text>
+        <Text style={styles.textStyle}>Done:</Text>
+        <FlatList
+          style={styles.flatliststyle2}
+          keyExtractor={keyHandler}
+          data={doneItemList}
+          renderItem={renderContent}
+        />
         <TextInput
           style={styles.inputStyle}
-          placeholder="Add list element here"
+          placeholder="Add cleaning tasks here"
           onChangeText={contentInputHandler}
           value={content}
         />
@@ -202,6 +227,17 @@ const renderContent = ({item, index}) => {
       margin: 5,
       padding: 5,
       width: '50%',
+    },
+    flatliststyle: {
+      width: '50%',
+      backgroundColor: 'white',
+    },
+    flatliststyle2: {
+      width: '50%',
+      textDecorationLine: 'line-through',
+      textDecorationStyle: 'solid',
+      backgroundColor: 'grey',
+      
     },
     deleteButtonText: {
       backgroundColor: "red",
