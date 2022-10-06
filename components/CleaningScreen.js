@@ -3,7 +3,7 @@ import {useState} from 'react';
 import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, init } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 var table="Cleaning";
@@ -89,6 +89,35 @@ async function updateContentInDb() {
   }
 }
 
+async function refresh(){
+  console.log(done);
+  done=0;
+  console.log(done);
+  try {
+    console.log("app 44");
+    const dbResult = await refreshDone(table, done);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    //No need to do anything
+  }
+}
+async function setAllDone(){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    const dbResult = await refreshDone(table, done);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+  }
+}
+
 async function readAllContent(id) {
   try {
     const dbResult = await fetchAllContent(table);
@@ -138,6 +167,8 @@ const renderContent = ({item, index}) => {
         <Button title="Edit here" onPress={() => updateContentInDb()} />
         <Text>Hello from Cleaning!</Text>
         <Button onPress={() => navigation.goBack()} title="Back" />
+        <Button title="Refresh all" onPress={() => refresh()} />
+        <Button title="Set all tasks done" onPress={() => setAllDone()} />
       </View>
     );
   }
