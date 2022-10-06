@@ -118,7 +118,7 @@ export const fetchAllContent=(tableName)=>{
     const promise=new Promise((resolve, reject)=>{
         db.transaction((tx)=>{
             //Here we select all from the table fish
-            tx.executeSql('select * from '+tableName, [],
+            tx.executeSql('select * from '+tableName+' where done=0', [],
                 (tx, result)=>{
                     let items=[];//Create a new empty Javascript array
                     //And add all the items of the result (database rows/records) into that table
@@ -128,6 +128,32 @@ export const fetchAllContent=(tableName)=>{
                     }
                     console.log(items);//For debugging purposes to see the data in console window
                     resolve(items);//The data the Promise will have when returned
+                },
+                (tx,err)=>{
+                    console.log("Err");
+                    console.log(err);
+                    reject(err);
+                }
+            );
+        });
+    });
+    return promise;
+};
+
+export const fetchAllDoneContent=(tableName)=>{
+    const promise=new Promise((resolve, reject)=>{
+        db.transaction((tx)=>{
+            //Here we select all from the table fish
+            tx.executeSql('select * from '+tableName+' where done=1', [],
+                (tx, result)=>{
+                    let items=[];//Create a new empty Javascript array
+                    
+                    for (let i = 0; i < result.rows.length; i++){
+                        items.push(result.rows.item(i));
+                        console.log(result.rows.item(i));
+                    }
+                    console.log(items);
+                    resolve(items);
                 },
                 (tx,err)=>{
                     console.log("Err");
