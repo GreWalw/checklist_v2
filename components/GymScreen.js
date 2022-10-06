@@ -5,6 +5,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, fetchAllDoneContent, fetchDone } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 
 var table="Gym";
@@ -151,22 +152,10 @@ async function readAllDoneContent() {
   }
 }
 
-async function readIfDone() {
-  try {
-    const dbResult = await fetchDone(table);
-    console.log('dbResult readAllContent in GymScreen.js');
-    console.log('nyt tulee done');
-    console.log(dbResult);
-    setItemList(dbResult);
-  } catch (err) {
-    console.log('Error: ' + err);
-  } finally {
-    console.log('All read');
-  }
-}
 
 const renderContent = ({item, index}) => {
   return (
+    
     <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
     <TouchableOpacity
       activeOpacity={0.8}
@@ -174,7 +163,25 @@ const renderContent = ({item, index}) => {
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
-           {item.content}
+           {item.content} 
+        </Text>
+        
+      </View>
+    </TouchableOpacity>
+    </Swipeable>
+  );
+};
+const renderContent2 = ({item, index}) => {
+  return (
+    
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={() => updateItem(index, item.content)}
+      key={index}>
+      <View style={styles.listItemStyle}>
+        <Text>
+           {item.content} <Icon name='check' size={30} color="black" />
         </Text>
       </View>
     </TouchableOpacity>
@@ -185,6 +192,7 @@ const renderContent = ({item, index}) => {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                <Text style={styles.textStyle}>GYM DAY YOU BEAST!</Text>
+               
                <Text style={styles.textStyle}>Not done:</Text>
         <FlatList
           style={styles.flatliststyle}
@@ -194,11 +202,14 @@ const renderContent = ({item, index}) => {
         />
         <Text style={styles.textStyle}>________________________________________</Text>
         <Text style={styles.textStyle}>Done:</Text>
+        <View style={styles.iconContainer}>
+        
+        </View>
         <FlatList
           style={styles.flatliststyle2}
           keyExtractor={keyHandler}
-          data={doneItemList}
-          renderItem={renderContent}
+          data={doneItemList} 
+          renderItem={renderContent2}
         />
         <TextInput
           style={styles.inputStyle}
@@ -227,6 +238,19 @@ const renderContent = ({item, index}) => {
       margin: 5,
       padding: 5,
       width: '50%',
+    },
+    iconContainer: {
+
+      marginTop: 16,
+  
+      marginBottom: 16,
+  
+      justifyContent: 'center',
+  
+      alignItems: 'center',
+  
+      textAlign: 'center',
+  
     },
     flatliststyle: {
       width: '50%',
