@@ -104,7 +104,20 @@ async function refresh(){
     //No need to do anything
   }
 }
-
+async function setAllDone(){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    const dbResult = await refreshDone(table, done);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+  }
+}
 
 async function readAllContent(id) {
   try {
@@ -155,8 +168,8 @@ const renderContent = ({item, index}) => {
         <Button title="Edit here" onPress={() => updateContentInDb()} />
         <Text>Hello from Gym!</Text>
         <Button onPress={() => navigation.goBack()} title="Back" />
-        <Button onPress={() => navigation.toggleDrawer()} title="Open/Close" />
         <Button title="Refresh all" onPress={() => refresh()} />
+        <Button title="Set all tasks done" onPress={() => setAllDone()} />
 
       </View>
     );
