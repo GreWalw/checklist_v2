@@ -52,7 +52,6 @@ async function sendContent(){
     console.log("app 22");
     const dbResult = await addContent(table, content, done);
     console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
-    readAllContent();
   } catch (err) {
     console.log(err);
   } finally {
@@ -71,6 +70,7 @@ async function deleteItem(id){
   try{
     const dbResult = await deleteContent(table, id);
     readAllContent();
+    readAllDoneContent();
   }
   catch(err){
     console.log(err);
@@ -122,7 +122,7 @@ async function setAllDone(){
     done=0;
     readAllContent();
     readAllDoneContent();
-    readIfDone();
+    
   }
 }
 

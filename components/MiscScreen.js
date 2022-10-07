@@ -5,6 +5,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, fetchAllDoneContent } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 var table="Miscellaneous";
 var done=0;
@@ -50,12 +51,12 @@ async function sendContent(){
     console.log("app 22");
     const dbResult = await addContent(table, content, done);
     console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
-    readAllContent();
   } catch (err) {
     console.log(err);
   } finally {
     setContent('');
     readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -67,13 +68,13 @@ const updateItem = id => {
 async function deleteItem(id){
   try{
     const dbResult = await deleteContent(table, id);
-    readAllContent();
   }
   catch(err){
     console.log(err);
   }
   finally{
-    //No need to do anything
+    readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -81,10 +82,11 @@ async function updateContentInDb() {
   try {
     const dbResult = await updateContent(table, updateID, content, done);
     console.log('Päivitys alkaapi tästä');
-    readAllContent();
   } catch (err) {
     console.log(err + ' funktio erroria');
   } finally {
+    readAllContent();
+    readAllDoneContent();
     setContent('');
     setUpdateId(-1);
   }
@@ -163,10 +165,27 @@ const renderContent = ({item, index}) => {
     </Swipeable>
   );
 };
+const renderContent2 = ({item, index}) => {
+  return (
+    
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={() => updateItem(index, item.content)}
+      key={index}>
+      <View style={styles.listItemStyle}>
+        <Text>
+           {item.content} <Icon name='check' size={30} color="black" />
+        </Text>
+      </View>
+    </TouchableOpacity>
+    </Swipeable>
+  );
+};
 
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-               <Text style={styles.textStyle}>Miscellaneous !</Text>
+               <Text style={styles.textStyle}>Miscellaneous!</Text>
         <FlatList
           style={styles.flatliststyle}
           keyExtractor={keyHandler}
@@ -179,7 +198,7 @@ const renderContent = ({item, index}) => {
           style={styles.flatliststyle2}
           keyExtractor={keyHandler}
           data={doneItemList}
-          renderItem={renderContent}
+          renderItem={renderContent2}
         />
         <TextInput
           style={styles.inputStyle}
