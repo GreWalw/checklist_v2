@@ -84,6 +84,10 @@ async function deleteItem(id){
 }
 
 async function updateContentInDb() {
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
   try {
     const dbResult = await updateContent(table, updateID, content, done);
     console.log('Päivitys alkaapi tästä');
