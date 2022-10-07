@@ -3,8 +3,9 @@ import {useState} from 'react';
 import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone, fetchAllDoneContent, fetchDone } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 
 var table="Gym";
@@ -26,6 +27,7 @@ function GymScreen({ navigation }) {
 
 const [content, setContent] = useState('');
 const [itemList, setItemList] = useState([]);
+const [doneItemList, setDoneItemList] = useState([]);
 const [updateID, setUpdateId] = useState(-1);
 //const [done, setDone] = useState();
 
@@ -46,16 +48,20 @@ const renderRightActions = (id) => {
 };
 
 async function sendContent(){
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
   try {
     console.log("app 22");
     const dbResult = await addContent(table, content, done);
     console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
-    readAllContent();
   } catch (err) {
     console.log(err);
   } finally {
     setContent('');
     readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -68,6 +74,7 @@ async function deleteItem(id){
   try{
     const dbResult = await deleteContent(table, id);
     readAllContent();
+    readAllDoneContent();
   }
   catch(err){
     console.log(err);
@@ -101,7 +108,8 @@ async function refresh(){
   } catch (err) {
     console.log(err);
   } finally {
-    //No need to do anything
+    readAllContent();
+    readAllDoneContent();
   }
 }
 async function setAllDone(){
@@ -116,6 +124,28 @@ async function setAllDone(){
     console.log(err);
   } finally {
     done=0;
+    readAllContent();
+    readAllDoneContent();
+    
+  }
+}
+
+async function setItemDone(id){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    console.log(done);
+    const dbResult = await checkItemDone(table, done, itemList[id].id);
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -132,8 +162,42 @@ async function readAllContent(id) {
   }
 }
 
+async function readAllDoneContent() {
+  try {
+    const dbResult = await fetchAllDoneContent(table);
+    console.log('dbResult readAllDoneContent in GymScreen.js');
+    console.log(dbResult);
+    setDoneItemList(dbResult);
+  } catch (err) {
+    console.log('Erroria pukkaa done: ' + err);
+  } finally {
+    console.log('All read');
+  }
+}
+
+
 const renderContent = ({item, index}) => {
   return (
+    
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={() => updateItem(index, item.content)}
+      onPress={()=>setItemDone(index, item.id)}
+      key={index}>
+      <View style={styles.listItemStyle}>
+        <Text>
+           {item.content} 
+        </Text>
+        
+      </View>
+    </TouchableOpacity>
+    </Swipeable>
+  );
+};
+const renderContent2 = ({item, index}) => {
+  return (
+    
     <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
     <TouchableOpacity
       activeOpacity={0.8}
@@ -141,7 +205,7 @@ const renderContent = ({item, index}) => {
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
-          no:{index} content:{item.content}
+           {item.content} <Icon name='check' size={30} color="black" />
         </Text>
       </View>
     </TouchableOpacity>
@@ -152,15 +216,28 @@ const renderContent = ({item, index}) => {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                <Text style={styles.textStyle}>GYM DAY YOU BEAST!</Text>
+               
+               <Text style={styles.textStyle}>Not done:</Text>
         <FlatList
           style={styles.flatliststyle}
           keyExtractor={keyHandler}
           data={itemList}
           renderItem={renderContent}
         />
+        <Text style={styles.textStyle}>________________________________________</Text>
+        <Text style={styles.textStyle}>Done:</Text>
+        <View style={styles.iconContainer}>
+        
+        </View>
+        <FlatList
+          style={styles.flatliststyle2}
+          keyExtractor={keyHandler}
+          data={doneItemList} 
+          renderItem={renderContent2}
+        />
         <TextInput
           style={styles.inputStyle}
-          placeholder="Add list element here"
+          placeholder="Add your task here"
           onChangeText={contentInputHandler}
           value={content}
         />
@@ -186,9 +263,34 @@ const renderContent = ({item, index}) => {
       padding: 5,
       width: '50%',
     },
+    iconContainer: {
+
+      marginTop: 16,
+  
+      marginBottom: 16,
+  
+      justifyContent: 'center',
+  
+      alignItems: 'center',
+  
+      textAlign: 'center',
+  
+    },
+    flatliststyle: {
+      width: '50%',
+      backgroundColor: 'white',
+    },
+    flatliststyle2: {
+      width: '50%',
+      textDecorationLine: 'line-through',
+      textDecorationStyle: 'solid',
+      backgroundColor: 'grey',
+      
+    },
     deleteButtonText: {
       backgroundColor: "red",
       color: "white",
     }
+
   });
   export default GymScreen;

@@ -3,8 +3,9 @@ import {useState} from 'react';
 import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init } from '../database/db';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone, fetchAllDoneContent } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 var table="Todo";
 var done=0;
@@ -25,6 +26,7 @@ function TodoScreen({ navigation }) {
 
 const [content, setContent] = useState('');
 const [itemList, setItemList] = useState([]);
+const [doneItemList, setDoneItemList] = useState([]);
 const [updateID, setUpdateId] = useState(-1);
 //const [done, setDone] = useState();
 
@@ -45,16 +47,20 @@ const renderRightActions = (id) => {
 };
 
 async function sendContent(){
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
   try {
     console.log("app 22");
     const dbResult = await addContent(table, content, done);
     console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
-    readAllContent();
   } catch (err) {
     console.log(err);
   } finally {
     setContent('');
     readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -66,13 +72,13 @@ const updateItem = id => {
 async function deleteItem(id){
   try{
     const dbResult = await deleteContent(table, id);
-    readAllContent();
   }
   catch(err){
     console.log(err);
   }
   finally{
-    //No need to do anything
+    readAllDoneContent();
+    readAllContent();
   }
 }
 
@@ -80,10 +86,11 @@ async function updateContentInDb() {
   try {
     const dbResult = await updateContent(table, updateID, content, done);
     console.log('Päivitys alkaapi tästä');
-    readAllContent();
   } catch (err) {
     console.log(err + ' funktio erroria');
   } finally {
+    readAllContent();
+    readAllDoneContent();
     setContent('');
     setUpdateId(-1);
   }
@@ -100,7 +107,8 @@ async function refresh(){
   } catch (err) {
     console.log(err);
   } finally {
-    //No need to do anything
+    readAllContent();
+    readAllDoneContent();
   }
 }
 async function setAllDone(){
@@ -115,6 +123,27 @@ async function setAllDone(){
     console.log(err);
   } finally {
     done=0;
+    readAllContent();
+    readAllDoneContent();
+  }
+}
+
+async function setItemDone(id){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    console.log(done);
+    const dbResult = await checkItemDone(table, done, itemList[id].id);
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
   }
 }
 
@@ -130,6 +159,18 @@ async function readAllContent(id) {
     console.log('All read');
   }
 }
+async function readAllDoneContent() {
+  try {
+    const dbResult = await fetchAllDoneContent(table);
+    console.log('dbResult readAllDoneContent in GymScreen.js');
+    console.log(dbResult);
+    setDoneItemList(dbResult);
+  } catch (err) {
+    console.log('Erroria pukkaa done: ' + err);
+  } finally {
+    console.log('All read');
+  }
+}
 
 const renderContent = ({item, index}) => {
   return (
@@ -137,25 +178,50 @@ const renderContent = ({item, index}) => {
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
+      onPress={()=>setItemDone(index, item.id)}
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
-          no:{index} content:{item.content}
+         {item.content}
         </Text>
       </View>
     </TouchableOpacity>
     </Swipeable>
   );
 };
-
+const renderContent2 = ({item, index}) => {
+  return (
+    
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={() => updateItem(index, item.content)}
+      key={index}>
+      <View style={styles.listItemStyle}>
+        <Text>
+           {item.content} <Icon name='check' size={30} color="black" />
+        </Text>
+      </View>
+    </TouchableOpacity>
+    </Swipeable>
+  );
+};
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-               <Text style={styles.textStyle}>TO DO !</Text>
+               <Text style={styles.textStyle}>TO DO!</Text>
         <FlatList
           style={styles.flatliststyle}
           keyExtractor={keyHandler}
           data={itemList}
           renderItem={renderContent}
+        />
+         <Text style={styles.textStyle}>________________________________________</Text>
+        <Text style={styles.textStyle}>Done:</Text>
+        <FlatList
+          style={styles.flatliststyle2}
+          keyExtractor={keyHandler}
+          data={doneItemList}
+          renderItem={renderContent2}
         />
         <TextInput
           style={styles.inputStyle}
@@ -165,7 +231,7 @@ const renderContent = ({item, index}) => {
         />
         <Button title="Add" onPress={() => sendContent()} />
         <Button title="Edit here" onPress={() => updateContentInDb()} />
-        <Text>Hello from ToDo!</Text>
+        <Text>Hello from To Do!</Text>
         <Button onPress={() => navigation.goBack()} title="Back" />
         <Button title="Refresh all" onPress={() => refresh()} />
         <Button title="Set all tasks done" onPress={() => setAllDone()} />
@@ -183,6 +249,17 @@ const renderContent = ({item, index}) => {
       margin: 5,
       padding: 5,
       width: '50%',
+    },
+    flatliststyle: {
+      width: '50%',
+      backgroundColor: 'white',
+    },
+    flatliststyle2: {
+      width: '50%',
+      textDecorationLine: 'line-through',
+      textDecorationStyle: 'solid',
+      backgroundColor: 'grey',
+      
     },
     deleteButtonText: {
       backgroundColor: "red",
