@@ -47,6 +47,10 @@ const renderRightActions = (id) => {
 };
 
 async function sendContent(){
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
   try {
     console.log("app 22");
     const dbResult = await addContent(table, content, done);
@@ -140,6 +144,7 @@ async function setItemDone(id){
   } finally {
     done=0;
     readAllContent();
+    readAllDoneContent();
   }
 }
 
