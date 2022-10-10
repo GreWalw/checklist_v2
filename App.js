@@ -1,17 +1,14 @@
 import * as React from 'react';
-import { Button, View } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import {Button, View} from 'react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer} from '@react-navigation/native';
 import HomeScreen from './components/HomeScreen';
 import GymScreen from './components/GymScreen';
 import CleaningScreen from './components/CleaningScreen';
 import GroceriesScreen from './components/GroceriesScreen';
 import TodoScreen from './components/TodoScreen';
 import MiscScreen from './components/MiscScreen';
-import {
-  init,
-  fetchAllContent,
-} from './database/db';
+import {init, fetchAllContent} from './database/db';
 
 init()
   .then(() => {
@@ -23,7 +20,7 @@ init()
 
 const Drawer = createDrawerNavigator();
 
-const App=()=>{
+const App = () => {
   return (
     <NavigationContainer>
       <Drawer.Navigator initialRouteName="Home">
@@ -31,10 +28,10 @@ const App=()=>{
         <Drawer.Screen name="Gym" component={GymScreen} />
         <Drawer.Screen name="Cleaning" component={CleaningScreen} />
         <Drawer.Screen name="Groceries" component={GroceriesScreen} />
-        <Drawer.Screen name="To-Do" component={TodoScreen} />
+        <Drawer.Screen name="ToDo" component={TodoScreen} />
         <Drawer.Screen name="Miscellaneous" component={MiscScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
-}
+};
 export default App;
