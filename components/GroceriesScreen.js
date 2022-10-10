@@ -151,6 +151,24 @@ async function setItemDone(id){
     readAllDoneContent();
   }
 }
+async function setItemNotDone(id){
+  console.log(done);
+  done=0;
+  console.log(done + "set item not done");
+  try {
+    console.log("app 159");
+    console.log(done);
+    const dbResult = await checkItemDone(table, done, doneItemList[id].id); //using the same db method as setItemDone
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
+  }
+}
 
 async function readAllContent(id) {
   try {
@@ -200,6 +218,7 @@ const renderContent2 = ({item, index}) => {
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
+      onPress={()=>setItemNotDone(index, item.id)}
       key={index}>
       <View style={styles.listItemStyle}>
         <Text>
