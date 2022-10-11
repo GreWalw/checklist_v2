@@ -29,6 +29,8 @@ const [content, setContent] = useState('');
 const [itemList, setItemList] = useState([]);
 const [doneItemList, setDoneItemList] = useState([]);
 const [updateID, setUpdateId] = useState(-1);
+let row: Array<any> = [];
+let prevOpenedRow;
 //const [done, setDone] = useState();
 
 const contentInputHandler = enteredText => {
@@ -47,6 +49,14 @@ const renderRightActions = (id) => {
   );
 };
 
+const closeRow = (index) => {
+  console.log('closerow');
+  if (prevOpenedRow && prevOpenedRow !== row[index]) {
+    prevOpenedRow.close();
+  }
+  prevOpenedRow = row[index];
+};
+
 async function sendContent(){
   if (!content.trim()) {
     alert('Input field is empty!');
@@ -62,12 +72,14 @@ async function sendContent(){
     setContent('');
     readAllContent();
     readAllDoneContent();
+    closeRow();
   }
 }
 
 const updateItem = id => {
   setUpdateId(itemList[id].id);
   setContent(itemList[id].content);
+  closeRow();
 };
 
 async function deleteItem(id){
@@ -75,6 +87,7 @@ async function deleteItem(id){
     const dbResult = await deleteContent(table, id);
     readAllContent();
     readAllDoneContent();
+    closeRow();
   }
   catch(err){
     console.log(err);
@@ -94,6 +107,7 @@ async function updateContentInDb() {
   } finally {
     setContent('');
     setUpdateId(-1);
+    closeRow();
   }
 }
 
@@ -110,6 +124,7 @@ async function refresh(){
   } finally {
     readAllContent();
     readAllDoneContent();
+    closeRow();
   }
 }
 async function setAllDone(){
@@ -126,6 +141,7 @@ async function setAllDone(){
     done=0;
     readAllContent();
     readAllDoneContent();
+    closeRow();
     
   }
 }
@@ -146,6 +162,7 @@ async function setItemDone(id){
     done=0;
     readAllContent();
     readAllDoneContent();
+    closeRow();
   }
 }
 
@@ -179,7 +196,10 @@ async function readAllDoneContent() {
 const renderContent = ({item, index}) => {
   return (
     
-    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}
+    onSwipeableWillOpen={() => closeRow(index)}
+      ref={(ref) => (row[index] = ref)}
+      rightOpenValue={-50}>  
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
