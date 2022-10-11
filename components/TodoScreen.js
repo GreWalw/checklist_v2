@@ -176,6 +176,7 @@ function TodoScreen({navigation}) {
       console.log('All read');
     }
   }
+  
   async function readAllDoneContent() {
     try {
       const dbResult = await fetchAllDoneContent(table);

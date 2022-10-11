@@ -9,6 +9,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
 } from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
@@ -24,6 +25,8 @@ import {
 } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Icon from 'react-native-vector-icons/EvilIcons';
+
+import {styles} from '../styles/styles';
 
 var table = 'Cleaning';
 var done = 0;
@@ -45,7 +48,6 @@ function CleaningScreen({navigation}) {
   const [itemList, setItemList] = useState([]);
   const [doneItemList, setDoneItemList] = useState([]);
   const [updateID, setUpdateId] = useState(-1);
-  //const [done, setDone] = useState();
 
   const contentInputHandler = enteredText => {
     setContent(enteredText);
@@ -56,7 +58,7 @@ function CleaningScreen({navigation}) {
       <View style={styles.swipedRow}>
         <Animated.View style={[styles.deleteButton]}>
           <TouchableOpacity onPress={() => deleteItem(id)} key={id}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.deleteButtonText}><Icon name="trash" size={50} color="linen" /></Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -71,7 +73,7 @@ function CleaningScreen({navigation}) {
     try {
       console.log('app 22');
       const dbResult = await addContent(table, content, done);
-      console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
+      console.log('dbResult: ' + dbResult);
     } catch (err) {
       console.log(err);
     } finally {
@@ -92,8 +94,8 @@ function CleaningScreen({navigation}) {
     } catch (err) {
       console.log(err);
     } finally {
-      readAllContent();
       readAllDoneContent();
+      readAllContent();
     }
   }
 
@@ -174,6 +176,7 @@ function CleaningScreen({navigation}) {
       console.log('All read');
     }
   }
+  
   async function readAllDoneContent() {
     try {
       const dbResult = await fetchAllDoneContent(table);
@@ -195,13 +198,14 @@ function CleaningScreen({navigation}) {
           onLongPress={() => updateItem(index, item.content)}
           onPress={() => setItemDone(index, item.id)}
           key={index}>
-          <View style={styles.listItemStyle}>
-            <Text>{item.content}</Text>
+          <View>
+            <Text style={styles.inputStyle}>{item.content}</Text>
           </View>
         </TouchableOpacity>
       </Swipeable>
     );
   };
+
   const renderContent2 = ({item, index}) => {
     return (
       <Swipeable renderRightActions={() => renderRightActions(item.id)}>
@@ -209,9 +213,9 @@ function CleaningScreen({navigation}) {
           activeOpacity={0.8}
           onLongPress={() => updateItem(index, item.content)}
           key={index}>
-          <View style={styles.listItemStyle}>
-            <Text>
-              {item.content} <Icon name="check" size={30} color="black" />
+          <View>
+            <Text style={styles.inputStyle}>
+            <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
             </Text>
           </View>
         </TouchableOpacity>
@@ -220,65 +224,54 @@ function CleaningScreen({navigation}) {
   };
 
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text style={styles.textStyle}>CLEANING DAY!</Text>
+    <View style={styles.container}>
+      <View style={styles.inputItems}>
+        <TextInput
+          style={styles.inputFieldStyle}
+          placeholder="Add to list here"
+          onChangeText={contentInputHandler}
+          value={content}
+        />
+        <TouchableHighlight onPress={() => {}}>
+          <View>
+            <Icon name="plus" size={50} onPress={() => sendContent()} />
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => {}}>
+          <View>
+            <Icon name="pencil" size={50} onPress={() => updateContentInDb()} />
+          </View>
+        </TouchableHighlight>
+      </View>
+
       <FlatList
-        style={styles.flatliststyle}
+        style={styles.flist}
         keyExtractor={keyHandler}
         data={itemList}
         renderItem={renderContent}
       />
-      <Text style={styles.textStyle}>
-        ________________________________________
-      </Text>
-      <Text style={styles.textStyle}>Done:</Text>
+      <Text style={styles.doneText}>What is done already</Text>
       <FlatList
-        style={styles.flatliststyle2}
+        style={styles.flist2}
         keyExtractor={keyHandler}
         data={doneItemList}
         renderItem={renderContent2}
       />
-      <TextInput
-        style={styles.inputStyle}
-        placeholder="Add cleaning tasks here"
-        onChangeText={contentInputHandler}
-        value={content}
-      />
-      <Button title="Add" onPress={() => sendContent()} />
-      <Button title="Edit here" onPress={() => updateContentInDb()} />
-      <Text>Hello from Cleaning!</Text>
-      <Button onPress={() => navigation.goBack()} title="Back" />
-      <Button title="Refresh all" onPress={() => refresh()} />
-      <Button title="Set all tasks done" onPress={() => setAllDone()} />
+
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity 
+          style={styles.massButton} 
+          onPress={() => refresh()}>
+          <Text>Refresh all</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.massButton}
+          onPress={() => setAllDone()}>
+          <Text>All done</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputStyle: {
-    flex: 0,
-    flexDirection: 'column',
-    backgroundColor: '#abc',
-    borderColor: 'black',
-    borderWidth: 2,
-    margin: 5,
-    padding: 5,
-    width: '50%',
-  },
-  flatliststyle: {
-    width: '50%',
-    backgroundColor: 'white',
-  },
-  flatliststyle2: {
-    width: '50%',
-    textDecorationLine: 'line-through',
-    textDecorationStyle: 'solid',
-    backgroundColor: 'grey',
-  },
-  deleteButtonText: {
-    backgroundColor: 'red',
-    color: 'white',
-  },
-});
 
 export default CleaningScreen;
