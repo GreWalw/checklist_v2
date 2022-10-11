@@ -58,7 +58,7 @@ function TodoScreen({navigation}) {
       <View style={styles.swipedRow}>
         <Animated.View style={[styles.deleteButton]}>
           <TouchableOpacity onPress={() => deleteItem(id)} key={id}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.deleteButtonText}><Icon name="trash" size={50} color="linen" /></Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -214,7 +214,7 @@ function TodoScreen({navigation}) {
           key={index}>
           <View>
             <Text style={styles.inputStyle}>
-              {item.content} <Icon name="check" size={25} color="black" />
+            <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
             </Text>
           </View>
         </TouchableOpacity>
@@ -227,7 +227,7 @@ function TodoScreen({navigation}) {
       <View style={styles.inputItems}>
         <TextInput
           style={styles.inputFieldStyle}
-          placeholder="Add list element here"
+          placeholder="Add to list here"
           onChangeText={contentInputHandler}
           value={content}
         />
@@ -249,7 +249,7 @@ function TodoScreen({navigation}) {
         data={itemList}
         renderItem={renderContent}
       />
-      <Text>Things done already!</Text>
+      <Text style={styles.doneText}>What is done already</Text>
       <FlatList
         style={styles.flist2}
         keyExtractor={keyHandler}

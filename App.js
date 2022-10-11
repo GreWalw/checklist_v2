@@ -28,7 +28,7 @@ const App = () => {
         <Drawer.Screen name="Gym" component={GymScreen} />
         <Drawer.Screen name="Cleaning" component={CleaningScreen} />
         <Drawer.Screen name="Groceries" component={GroceriesScreen} />
-        <Drawer.Screen name="ToDo" component={TodoScreen} />
+        <Drawer.Screen name="To-Do" component={TodoScreen} />
         <Drawer.Screen name="Miscellaneous" component={MiscScreen} />
       </Drawer.Navigator>
     </NavigationContainer>

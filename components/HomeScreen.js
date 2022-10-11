@@ -10,20 +10,24 @@ function HomeScreen({ navigation }) {
     return (
       <View style={styles.container}>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Gym')}>
-            <Text>GYM</Text>
+            <Text style={styles.textStyle}>GYM</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Cleaning')}>
-            <Text>CLEANING</Text>
+            <Text style={styles.textStyle}>CLEANING</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Groceries')}>
-            <Text>GROCERIES</Text>
+            <Text style={styles.textStyle}>GROCERIES</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ToDo')}>
-            <Text>TODO</Text>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('To-Do')}>
+            <Text style={styles.textStyle}>TO-DO</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Miscellaneous')}>
-            <Text>MISC</Text>
+            <Text style={styles.textStyle}>MISC</Text>
           </TouchableOpacity>
+          <View style={styles.brand}>
+            <Text>SIKLIST - 2022</Text>
+            <Text>Grek - Heinonen - Kailanto</Text>
+          </View>
       </View>
     );
   }
