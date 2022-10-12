@@ -1,14 +1,35 @@
 import * as React from 'react';
 import {useState} from 'react';
-import { Animated, Button, View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone, fetchAllDoneContent } from '../database/db';
+import {
+  Animated,
+  Button,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  TouchableHighlight,
+} from 'react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer} from '@react-navigation/native';
+import {
+  addContent,
+  updateContent,
+  fetchAllContent,
+  deleteContent,
+  refreshDone,
+  init,
+  checkItemDone,
+  fetchAllDoneContent,
+} from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Icon from 'react-native-vector-icons/EvilIcons';
 
-var table="Todo";
-var done=0;
+import {styles} from '../styles/styles';
+
+var table = 'Todo';
+var done = 0;
 
 init(table)
   .then(() => {
@@ -21,32 +42,30 @@ init(table)
 const keyHandler = (item, index) => {
   return index.toString();
 };
-  
-function TodoScreen({ navigation }) {
 
+function TodoScreen({navigation}) {
 const [content, setContent] = useState('');
 const [itemList, setItemList] = useState([]);
 const [doneItemList, setDoneItemList] = useState([]);
 const [updateID, setUpdateId] = useState(-1);
 let row: Array<any> = [];
 let prevOpenedRow;
-//const [done, setDone] = useState();
 
-const contentInputHandler = enteredText => {
-  setContent(enteredText);
-};
+  const contentInputHandler = enteredText => {
+    setContent(enteredText);
+  };
 
-const renderRightActions = (id) => {
-  return (
-    <View style={styles.swipedRow}>
-      <Animated.View style={[styles.deleteButton]}>
-        <TouchableOpacity onPress={()=>deleteItem(id)} key={id}>
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
-  );
-};
+  const renderRightActions = id => {
+    return (
+      <View style={styles.swipedRow}>
+        <Animated.View style={[styles.deleteButton]}>
+          <TouchableOpacity onPress={() => deleteItem(id)} key={id}>
+            <Text style={styles.deleteButtonText}><Icon name="trash" size={50} color="linen" /></Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  };
 
 const closeRow = (index) => {
   console.log('closerow');
@@ -73,7 +92,6 @@ async function sendContent(){
     readAllDoneContent();
     closeRow();
   }
-}
 
 const updateItem = id => {
   setUpdateId(itemList[id].id);
@@ -93,7 +111,6 @@ async function deleteItem(id){
     readAllContent();
     closeRow();
   }
-}
 
 async function updateContentInDb() {
   if (!content.trim()) {
@@ -112,7 +129,6 @@ async function updateContentInDb() {
     setUpdateId(-1);
     closeRow();
   }
-}
 
 async function refresh(){
   console.log(done);
@@ -146,15 +162,14 @@ async function setAllDone(){
     readAllDoneContent();
     closeRow();
   }
-}
 
-async function setItemDone(id){
-  console.log(done);
-  done=1;
-  console.log(done);
-  try {
-    console.log("app 44");
+  async function setItemDone(id) {
     console.log(done);
+    done = 1;
+    console.log(done);
+    try {
+      console.log('app 44');
+      console.log(done);
     const dbResult = await checkItemDone(table, done, itemList[id].id);
     console.log(itemList[id].id);
     console.log('dbResult: ' + dbResult); 
@@ -185,32 +200,32 @@ async function setItemNotDone(id){
     readAllContent();
     readAllDoneContent();
   }
-}
 
-async function readAllContent(id) {
-  try {
-    const dbResult = await fetchAllContent(table);
-    console.log('dbResult readAllContent in GymScreen.js');
-    console.log(dbResult);
-    setItemList(dbResult);
-  } catch (err) {
-    console.log('Error: ' + err);
-  } finally {
-    console.log('All read');
+  async function readAllContent(id) {
+    try {
+      const dbResult = await fetchAllContent(table);
+      console.log('dbResult readAllContent in GymScreen.js');
+      console.log(dbResult);
+      setItemList(dbResult);
+    } catch (err) {
+      console.log('Error: ' + err);
+    } finally {
+      console.log('All read');
+    }
   }
-}
-async function readAllDoneContent() {
-  try {
-    const dbResult = await fetchAllDoneContent(table);
-    console.log('dbResult readAllDoneContent in GymScreen.js');
-    console.log(dbResult);
-    setDoneItemList(dbResult);
-  } catch (err) {
-    console.log('Erroria pukkaa done: ' + err);
-  } finally {
-    console.log('All read');
+  
+  async function readAllDoneContent() {
+    try {
+      const dbResult = await fetchAllDoneContent(table);
+      console.log('dbResult readAllDoneContent in GymScreen.js');
+      console.log(dbResult);
+      setDoneItemList(dbResult);
+    } catch (err) {
+      console.log('Erroria pukkaa done: ' + err);
+    } finally {
+      console.log('All read');
+    }
   }
-}
 
 const renderContent = ({item, index}) => {
   return (
@@ -233,83 +248,73 @@ const renderContent = ({item, index}) => {
     </Swipeable>
   );
 };
-const renderContent2 = ({item, index}) => {
-  console.log("return2 alku");
-  return (
-    <Swipeable renderRightActions={()=>renderRightActions(item.id)}>
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onLongPress={() => updateItem(index, item.content)}
-      onPress={()=>setItemNotDone(index, item.id)}
-      key={index}>
-      <View style={styles.listItemStyle}>
-        <Text>
-           {item.content} <Icon name='check' size={30} color="black" />
-        </Text>
-      </View>
-    </TouchableOpacity>
-    </Swipeable>
-  );
-};
+
+  const renderContent2 = ({item, index}) => {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-               <Text style={styles.textStyle}>TO DO!</Text>
-        <FlatList
-          style={styles.flatliststyle}
-          keyExtractor={keyHandler}
-          data={itemList}
-          renderItem={renderContent}
-        />
-         <Text style={styles.textStyle}>________________________________________</Text>
-        <Text style={styles.textStyle}>Done:</Text>
-        <FlatList
-          style={styles.flatliststyle2}
-          keyExtractor={keyHandler}
-          data={doneItemList}
-          renderItem={renderContent2}
-        />
+      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onLongPress={() => updateItem(index, item.content)}
+          key={index}>
+          <View>
+            <Text style={styles.inputStyle}>
+            <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.inputItems}>
         <TextInput
-          style={styles.inputStyle}
-          placeholder="Add list element here"
+          style={styles.inputFieldStyle}
+          placeholder="Add to list here"
           onChangeText={contentInputHandler}
           value={content}
         />
-        <Button title="Add" onPress={() => sendContent()} />
-        <Button title="Edit here" onPress={() => updateContentInDb()} />
-        <Text>Hello from To Do!</Text>
-        <Button onPress={() => navigation.goBack()} title="Back" />
-        <Button title="Refresh all" onPress={() => refresh()} />
-        <Button title="Set all tasks done" onPress={() => setAllDone()} />
+        <TouchableHighlight onPress={() => {}}>
+          <View>
+            <Icon name="plus" size={50} onPress={() => sendContent()} />
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => {}}>
+          <View>
+            <Icon name="pencil" size={50} onPress={() => updateContentInDb()} />
+          </View>
+        </TouchableHighlight>
       </View>
-    );
-  }
 
-  const styles = StyleSheet.create({
-    inputStyle: {
-      flex: 0,
-      flexDirection: 'column',
-      backgroundColor: '#abc',
-      borderColor: 'black',
-      borderWidth: 2,
-      margin: 5,
-      padding: 5,
-      width: '50%',
-    },
-    flatliststyle: {
-      width: '50%',
-      backgroundColor: 'white',
-    },
-    flatliststyle2: {
-      width: '50%',
-      textDecorationLine: 'line-through',
-      textDecorationStyle: 'solid',
-      backgroundColor: 'grey',
-      
-    },
-    deleteButtonText: {
-      backgroundColor: "red",
-      color: "white",
-    }
-  });
+      <FlatList
+        style={styles.flist}
+        keyExtractor={keyHandler}
+        data={itemList}
+        renderItem={renderContent}
+      />
+      <Text style={styles.doneText}>What is done already</Text>
+      <FlatList
+        style={styles.flist2}
+        keyExtractor={keyHandler}
+        data={doneItemList}
+        renderItem={renderContent2}
+      />
 
-  export default TodoScreen;
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity 
+          style={styles.massButton} 
+          onPress={() => refresh()}>
+          <Text>Refresh all</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.massButton}
+          onPress={() => setAllDone()}>
+          <Text>All done</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+export default TodoScreen;
