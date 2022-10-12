@@ -44,12 +44,13 @@ const keyHandler = (item, index) => {
 };
 
 function MiscScreen({navigation}) {
-const [content, setContent] = useState('');
-const [itemList, setItemList] = useState([]);
-const [doneItemList, setDoneItemList] = useState([]);
-const [updateID, setUpdateId] = useState(-1);
-let row: Array<any> = [];
-let prevOpenedRow;
+  const [content, setContent] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [doneItemList, setDoneItemList] = useState([]);
+  const [updateID, setUpdateId] = useState(-1);
+
+  let row: Array<any> = [];
+  let prevOpenedRow;
 
   const contentInputHandler = enteredText => {
     setContent(enteredText);
@@ -66,6 +67,7 @@ let prevOpenedRow;
       </View>
     );
   };
+
 
 const closeRow = (index) => {
   console.log('closerow');
@@ -92,6 +94,7 @@ async function sendContent(){
     readAllDoneContent();
     closeRow();
   }
+}
 
 const updateItem = id => {
   setUpdateId(itemList[id].id);
@@ -111,6 +114,7 @@ async function deleteItem(id){
     readAllDoneContent();
     closeRow();
   }
+}
 
 async function updateContentInDb() {
   if (!content.trim()) {
@@ -129,6 +133,7 @@ async function updateContentInDb() {
     setUpdateId(-1);
     closeRow();
   }
+}
 
 async function refresh(){
   console.log(done);
@@ -146,6 +151,7 @@ async function refresh(){
     closeRow();
   }
 }
+
 async function setAllDone(){
   console.log(done);
   done=1;
@@ -162,25 +168,26 @@ async function setAllDone(){
     readAllDoneContent();
     closeRow();
   }
+}
 
-  async function setItemDone(id) {
+async function setItemDone(id) {
+  console.log(done);
+  done = 1;
+  console.log(done);
+  try {
+    console.log('app 44');
     console.log(done);
-    done = 1;
-    console.log(done);
-    try {
-      console.log('app 44');
-      console.log(done);
-    const dbResult = await checkItemDone(table, done, itemList[id].id);
-    console.log(itemList[id].id);
-    console.log('dbResult: ' + dbResult); 
-  } catch (err) {
-    console.log(err);
-  } finally {
-    done=0;
-    readAllContent();
-    readAllDoneContent();
-    closeRow();
-  }
+  const dbResult = await checkItemDone(table, done, itemList[id].id);
+  console.log(itemList[id].id);
+  console.log('dbResult: ' + dbResult); 
+} catch (err) {
+  console.log(err);
+} finally {
+  done=0;
+  readAllContent();
+  readAllDoneContent();
+  closeRow();
+}
 }
 
 async function setItemNotDone(id){
@@ -200,6 +207,7 @@ async function setItemNotDone(id){
     readAllContent();
     readAllDoneContent();
   }
+}
 
   async function readAllContent(id) {
     try {
@@ -230,7 +238,7 @@ async function setItemNotDone(id){
 const renderContent = ({item, index}) => {
   return (
     <Swipeable renderRightActions={()=>renderRightActions(item.id)}
-    onSwipeableWillOpen={() => closeRow(index)}
+      onSwipeableWillOpen={() => closeRow(index)}
       ref={(ref) => (row[index] = ref)}
       rightOpenValue={-50}>
     <TouchableOpacity
@@ -239,7 +247,7 @@ const renderContent = ({item, index}) => {
       onPress={()=>setItemDone(index, item.id)}
       key={index}>
       <View style={styles.listItemStyle}>
-        <Text>
+        <Text style={styles.inputStyle}>
           {item.content}
         </Text>
       </View>
@@ -250,10 +258,9 @@ const renderContent = ({item, index}) => {
 
   const renderContent2 = ({item, index}) => {
     return (
-      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onLongPress={() => updateItem(index, item.content)}
+          onLongPress={() => setItemNotDone(index, item.id)}
           key={index}>
           <View>
             <Text style={styles.inputStyle}>
@@ -261,7 +268,6 @@ const renderContent = ({item, index}) => {
             </Text>
           </View>
         </TouchableOpacity>
-      </Swipeable>
     );
   };
 
@@ -314,6 +320,6 @@ const renderContent = ({item, index}) => {
       </View>
     </View>
   );
-}
+  }
 
 export default MiscScreen;

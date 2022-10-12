@@ -8,6 +8,7 @@ import CleaningScreen from './components/CleaningScreen';
 import GroceriesScreen from './components/GroceriesScreen';
 import TodoScreen from './components/TodoScreen';
 import MiscScreen from './components/MiscScreen';
+import AboutScreen from './components/AboutScreen';
 import {init, fetchAllContent} from './database/db';
 
 init()
@@ -30,6 +31,7 @@ const App = () => {
         <Drawer.Screen name="Groceries" component={GroceriesScreen} />
         <Drawer.Screen name="To-Do" component={TodoScreen} />
         <Drawer.Screen name="Miscellaneous" component={MiscScreen} />
+        <Drawer.Screen name="About" component={AboutScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

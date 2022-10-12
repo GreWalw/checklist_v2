@@ -25,8 +25,7 @@ function HomeScreen({ navigation }) {
             <Text style={styles.textStyle}>MISC</Text>
           </TouchableOpacity>
           <View style={styles.brand}>
-            <Text>SIKLIST - 2022</Text>
-            <Text>Grek - Heinonen - Kailanto</Text>
+            <Text style={styles.frontFont}>SIKLIST</Text>
           </View>
       </View>
     );

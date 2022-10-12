@@ -83,6 +83,27 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
+    },
+    frontFont: {
+        fontFamily: 'sans-serif-thin',
+        fontSize: 35,
+    },
+    aboutHeader: {
+        fontFamily: 'sans-serif-thin',
+        fontSize: 40,
+    },
+    aboutText: {
+        margin: 30,
+        fontSize: 14.5,
+    },
+    aboutText2: {
+        margin: 30,
+        fontSize: 14.5,
+    },
+    contentContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        marginBottom: 10,
     }
 });
 

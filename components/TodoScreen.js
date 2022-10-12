@@ -92,6 +92,7 @@ async function sendContent(){
     readAllDoneContent();
     closeRow();
   }
+}
 
 const updateItem = id => {
   setUpdateId(itemList[id].id);
@@ -111,6 +112,7 @@ async function deleteItem(id){
     readAllContent();
     closeRow();
   }
+}
 
 async function updateContentInDb() {
   if (!content.trim()) {
@@ -129,6 +131,7 @@ async function updateContentInDb() {
     setUpdateId(-1);
     closeRow();
   }
+}
 
 async function refresh(){
   console.log(done);
@@ -146,6 +149,7 @@ async function refresh(){
     closeRow();
   }
 }
+
 async function setAllDone(){
   console.log(done);
   done=1;
@@ -162,6 +166,7 @@ async function setAllDone(){
     readAllDoneContent();
     closeRow();
   }
+}
 
   async function setItemDone(id) {
     console.log(done);
@@ -200,6 +205,7 @@ async function setItemNotDone(id){
     readAllContent();
     readAllDoneContent();
   }
+}
 
   async function readAllContent(id) {
     try {
@@ -240,7 +246,7 @@ const renderContent = ({item, index}) => {
       onPress={()=>setItemDone(index, item.id)}
       key={index}>
       <View style={styles.listItemStyle}>
-        <Text>
+        <Text style={styles.inputStyle}>
          {item.content}
         </Text>
       </View>
@@ -249,22 +255,20 @@ const renderContent = ({item, index}) => {
   );
 };
 
-  const renderContent2 = ({item, index}) => {
-    return (
-      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => updateItem(index, item.content)}
-          key={index}>
-          <View>
-            <Text style={styles.inputStyle}>
-            <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
-    );
-  };
+const renderContent2 = ({item, index}) => {
+  return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onLongPress={() => setItemNotDone(index, item.id)}
+        key={index}>
+        <View>
+          <Text style={styles.inputStyle}>
+          <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
+          </Text>
+        </View>
+      </TouchableOpacity>
+  );
+};
 
   return (
     <View style={styles.container}>
