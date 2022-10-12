@@ -44,10 +44,12 @@ const keyHandler = (item, index) => {
 };
 
 function MiscScreen({navigation}) {
-  const [content, setContent] = useState('');
-  const [itemList, setItemList] = useState([]);
-  const [doneItemList, setDoneItemList] = useState([]);
-  const [updateID, setUpdateId] = useState(-1);
+const [content, setContent] = useState('');
+const [itemList, setItemList] = useState([]);
+const [doneItemList, setDoneItemList] = useState([]);
+const [updateID, setUpdateId] = useState(-1);
+let row: Array<any> = [];
+let prevOpenedRow;
 
   const contentInputHandler = enteredText => {
     setContent(enteredText);
@@ -65,84 +67,100 @@ function MiscScreen({navigation}) {
     );
   };
 
-  async function sendContent() {
-    if (!content.trim()) {
-      alert('Input field is empty!');
-      return;
-    }
-    try {
-      console.log('app 22');
-      const dbResult = await addContent(table, content, done);
-      console.log('dbResult: ' + dbResult);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setContent('');
-      readAllContent();
-      readAllDoneContent();
-    }
+const closeRow = (index) => {
+  console.log('closerow');
+  if (prevOpenedRow && prevOpenedRow !== row[index]) {
+    prevOpenedRow.close();
+  }
+  prevOpenedRow = row[index];
+};
+
+async function sendContent(){
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
+  try {
+    console.log("app 22");
+    const dbResult = await addContent(table, content, done);
+    console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setContent('');
+    readAllContent();
+    readAllDoneContent();
+    closeRow();
   }
 
-  const updateItem = id => {
-    setUpdateId(itemList[id].id);
-    setContent(itemList[id].content);
-  };
+const updateItem = id => {
+  setUpdateId(itemList[id].id);
+  setContent(itemList[id].content);
+  closeRow();
+};
 
-  async function deleteItem(id) {
-    try {
-      const dbResult = await deleteContent(table, id);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      readAllDoneContent();
-      readAllContent();
-    }
+async function deleteItem(id){
+  try{
+    const dbResult = await deleteContent(table, id);
+  }
+  catch(err){
+    console.log(err);
+  }
+  finally{
+    readAllContent();
+    readAllDoneContent();
+    closeRow();
   }
 
-  async function updateContentInDb() {
-    try {
-      const dbResult = await updateContent(table, updateID, content, done);
-      console.log('Päivitys alkaapi tästä');
-    } catch (err) {
-      console.log(err + ' funktio erroria');
-    } finally {
-      readAllContent();
-      readAllDoneContent();
-      setContent('');
-      setUpdateId(-1);
-    }
+async function updateContentInDb() {
+  if (!content.trim()) {
+    alert('Input field is empty!');
+    return;
+  }
+  try {
+    const dbResult = await updateContent(table, updateID, content, done);
+    console.log('Päivitys alkaapi tästä');
+  } catch (err) {
+    console.log(err + ' funktio erroria');
+  } finally {
+    readAllContent();
+    readAllDoneContent();
+    setContent('');
+    setUpdateId(-1);
+    closeRow();
   }
 
-  async function refresh() {
-    console.log(done);
-    done = 0;
-    console.log(done);
-    try {
-      console.log('app 44');
-      const dbResult = await refreshDone(table, done);
-      console.log('dbResult: ' + dbResult);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      readAllContent();
-      readAllDoneContent();
-    }
+async function refresh(){
+  console.log(done);
+  done=0;
+  console.log(done);
+  try {
+    console.log("app 44");
+    const dbResult = await refreshDone(table, done);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    readAllContent();
+    readAllDoneContent();
+    closeRow();
   }
-  async function setAllDone() {
-    console.log(done);
-    done = 1;
-    console.log(done);
-    try {
-      console.log('app 44');
-      const dbResult = await refreshDone(table, done);
-      console.log('dbResult: ' + dbResult);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      done = 0;
-      readAllContent();
-      readAllDoneContent();
-    }
+}
+async function setAllDone(){
+  console.log(done);
+  done=1;
+  console.log(done);
+  try {
+    console.log("app 44");
+    const dbResult = await refreshDone(table, done);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
+    closeRow();
   }
 
   async function setItemDone(id) {
@@ -152,16 +170,35 @@ function MiscScreen({navigation}) {
     try {
       console.log('app 44');
       console.log(done);
-      const dbResult = await checkItemDone(table, done, itemList[id].id);
-      console.log(itemList[id].id);
-      console.log('dbResult: ' + dbResult);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      done = 0;
-      readAllContent();
-      readAllDoneContent();
-    }
+    const dbResult = await checkItemDone(table, done, itemList[id].id);
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
+    closeRow();
+  }
+}
+
+async function setItemNotDone(id){
+  console.log(done);
+  done=0;
+  console.log(done + "set item not done");
+  try {
+    console.log("app 159");
+    console.log(done);
+    const dbResult = await checkItemDone(table, done, doneItemList[id].id); //using the same db method as setItemDone
+    console.log(itemList[id].id);
+    console.log('dbResult: ' + dbResult); 
+  } catch (err) {
+    console.log(err);
+  } finally {
+    done=0;
+    readAllContent();
+    readAllDoneContent();
   }
 
   async function readAllContent(id) {
@@ -190,21 +227,26 @@ function MiscScreen({navigation}) {
     }
   }
 
-  const renderContent = ({item, index}) => {
-    return (
-      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => updateItem(index, item.content)}
-          onPress={() => setItemDone(index, item.id)}
-          key={index}>
-          <View>
-            <Text style={styles.inputStyle}>{item.content}</Text>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
-    );
-  };
+const renderContent = ({item, index}) => {
+  return (
+    <Swipeable renderRightActions={()=>renderRightActions(item.id)}
+    onSwipeableWillOpen={() => closeRow(index)}
+      ref={(ref) => (row[index] = ref)}
+      rightOpenValue={-50}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={() => updateItem(index, item.content)}
+      onPress={()=>setItemDone(index, item.id)}
+      key={index}>
+      <View style={styles.listItemStyle}>
+        <Text>
+          {item.content}
+        </Text>
+      </View>
+    </TouchableOpacity>
+    </Swipeable>
+  );
+};
 
   const renderContent2 = ({item, index}) => {
     return (
