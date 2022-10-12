@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {Button, View} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import HomeScreen from './components/HomeScreen';
@@ -9,7 +8,7 @@ import GroceriesScreen from './components/GroceriesScreen';
 import TodoScreen from './components/TodoScreen';
 import MiscScreen from './components/MiscScreen';
 import AboutScreen from './components/AboutScreen';
-import {init, fetchAllContent} from './database/db';
+import {init} from './database/db';
 
 init()
   .then(() => {

@@ -1,10 +1,6 @@
 import * as React from 'react';
-import { Button, View, Text, TouchableOpacity } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import { init, addContent, updateContent, deleteContent, fetchAllContent } from './database/db';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '../styles/styles';
-import Icon from 'react-native-vector-icons/EvilIcons';
 
 function HomeScreen({ navigation }) {
     return (

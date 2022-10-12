@@ -1,28 +1,21 @@
-import React from 'react';
-
 import {openDatabase} from 'react-native-sqlite-storage';
 
 var db = openDatabase({name: 'checklist.db'});
 
-//method returns a Promise - in the calling side .then(...).then(...)....catch(...) can be used
 export const init = tableName => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS ' + tableName + '', []); //uncomment this if needed - sometimes it is good to empty the table
-      //By default, primary key is auto_incremented - we do not add anything to that column
+      // tx.executeSql('DROP TABLE IF EXISTS ' + tableName + '', []);
       tx.executeSql(
         'create table if not exists ' +
           tableName +
           '(id integer not null primary key, tablename text not null, content text not null, done int not null);',
-        [], //second parameters of execution:empty square brackets - this parameter is not needed when creating table
-        //If the transaction succeeds, this is called
+        [],
         () => {
-          resolve('Database created.'); //There is no need to return anything
+          resolve('Database created.');
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
-          console.log('db 22');
         },
       );
     });
@@ -33,23 +26,16 @@ export const init = tableName => {
 export const addContent = (tableName, content, done) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      console.log('db 32');
-      //Here we use the Prepared statement, just putting placeholders to the values to be inserted
       tx.executeSql(
         'insert into ' +
           tableName +
           '(tablename, content, done) values(?,?,?);',
-        //And the values come here
         [tableName, content, done],
-        //If the transaction succeeds, this is called
         () => {
           resolve('Adding content.');
-          console.log('db 39');
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
-          console.log('db 44');
         },
       );
     });
@@ -59,20 +45,14 @@ export const addContent = (tableName, content, done) => {
 export const updateContent = (tableName, id, content, done) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we use the Prepared statement, just putting placeholders to the values to be inserted
       tx.executeSql(
         'update ' + tableName + ' set content=?, done=? where id=?;',
-        //And the values come here
         [content, done, id],
-        //If the transaction succeeds, this is called
         () => {
-          resolve();
-          console.log('db resolve');
+          resolve("Updated.");
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
-          console.log('db erroria');
         },
       );
     });
@@ -82,19 +62,14 @@ export const updateContent = (tableName, id, content, done) => {
 export const refreshDone = (tableName, done) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we use the Prepared statement, just putting placeholders to the values to be inserted
       tx.executeSql(
         'update ' + tableName + ' set done=?;',
-        //And the values come here
         [done],
-        //If the transaction succeeds, this is called
         () => {
-          resolve('Success.');
+          resolve('Refresh succesful.');
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
-          console.log('Error db 87');
         },
       );
     });
@@ -104,19 +79,14 @@ export const refreshDone = (tableName, done) => {
 export const checkItemDone = (tableName, done, id) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we use the Prepared statement, just putting placeholders to the values to be inserted
       tx.executeSql(
         'update ' + tableName + ' set done=? where id=?;',
-        //And the values come here
         [done, id],
-        //If the transaction succeeds, this is called
         () => {
-          resolve('Success.');
+          resolve('Item set done succesfully.');
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
-          console.log('Error db 87');
         },
       );
     });
@@ -126,16 +96,12 @@ export const checkItemDone = (tableName, done, id) => {
 export const deleteContent = (tableName, id) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we use the Prepared statement, just putting placeholders to the values to be inserted
       tx.executeSql(
         'delete from ' + tableName + ' where id=?;',
-        //And the values come here
         [id],
-        //If the transaction succeeds, this is called
         () => {
-          resolve();
+          resolve("Content deleted succesfully.");
         },
-        //If the transaction fails, this is called
         (_, err) => {
           reject(err);
         },
@@ -148,23 +114,18 @@ export const deleteContent = (tableName, id) => {
 export const fetchAllContent = tableName => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we select all from the table fish
       tx.executeSql(
         'select * from ' + tableName + ' where done=0',
         [],
         (tx, result) => {
-          let items = []; //Create a new empty Javascript array
-          //And add all the items of the result (database rows/records) into that table
+          let items = [];
           for (let i = 0; i < result.rows.length; i++) {
-            items.push(result.rows.item(i)); //The form of an item is {"breed": "Pike", "id": 1, "weight": 5000}
-            console.log(result.rows.item(i)); //For debugging purposes to see the data in console window
+            items.push(result.rows.item(i));
+            console.log(result.rows.item(i));
           }
-          console.log(items); //For debugging purposes to see the data in console window
-          resolve(items); //The data the Promise will have when returned
+          resolve(items);
         },
         (tx, err) => {
-          console.log('Err');
-          console.log(err);
           reject(err);
         },
       );
@@ -176,23 +137,19 @@ export const fetchAllContent = tableName => {
 export const fetchAllDoneContent = tableName => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(tx => {
-      //Here we select all from the table fish
       tx.executeSql(
         'select * from ' + tableName + ' where done=1',
         [],
         (tx, result) => {
-          let items = []; //Create a new empty Javascript array
+          let items = [];
 
           for (let i = 0; i < result.rows.length; i++) {
             items.push(result.rows.item(i));
             console.log(result.rows.item(i));
           }
-          console.log(items);
           resolve(items);
         },
         (tx, err) => {
-          console.log('Err');
-          console.log(err);
           reject(err);
         },
       );

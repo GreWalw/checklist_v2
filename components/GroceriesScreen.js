@@ -1,28 +1,7 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {
-  Animated,
-  Button,
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {NavigationContainer} from '@react-navigation/native';
-import {
-  addContent,
-  updateContent,
-  fetchAllContent,
-  deleteContent,
-  refreshDone,
-  init,
-  checkItemDone,
-  fetchAllDoneContent,
-} from '../database/db';
+import { Animated, View, Text, TextInput, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { addContent, updateContent, fetchAllContent, deleteContent, refreshDone, init, checkItemDone, fetchAllDoneContent } from '../database/db';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Icon from 'react-native-vector-icons/EvilIcons';
 
@@ -44,31 +23,23 @@ const keyHandler = (item, index) => {
 };
 
 function GroceriesScreen({navigation}) {
-const [content, setContent] = useState('');
-const [itemList, setItemList] = useState([]);
-const [doneItemList, setDoneItemList] = useState([]);
-const [updateID, setUpdateId] = useState(-1);
-let row: Array<any> = [];
-let prevOpenedRow;
+  const [content, setContent] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [doneItemList, setDoneItemList] = useState([]);
+  const [updateID, setUpdateId] = useState(-1);
 
+  let row: Array<any> = [];
+  let prevOpenedRow;
+
+  readAllContent();
+  readAllDoneContent();
+  
   const contentInputHandler = enteredText => {
     setContent(enteredText);
   };
 
-  const renderRightActions = id => {
-    return (
-      <View style={styles.swipedRow}>
-        <Animated.View style={[styles.deleteButton]}>
-          <TouchableOpacity onPress={() => deleteItem(id)} key={id}>
-            <Text style={styles.deleteButtonText}><Icon name="trash" size={50} color="linen" /></Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    );
-  };
-
 const closeRow = (index) => {
-  console.log('closerow');
+  console.log('Closing row.');
   if (prevOpenedRow && prevOpenedRow !== row[index]) {
     prevOpenedRow.close();
   }
@@ -81,7 +52,7 @@ async function sendContent(){
     return;
   }
   try {
-    console.log("app 22");
+    console.log("Sending content.");
     const dbResult = await addContent(table, content, done);
     console.log('dbResult: ' + dbResult); //For debugging purposes to see the data in the console screen
   } catch (err) {
@@ -103,7 +74,6 @@ const updateItem = id => {
 async function deleteItem(id){
   try{
     const dbResult = await deleteContent(table, id);
-    
   }
   catch(err){
     console.log(err);
@@ -122,9 +92,9 @@ async function updateContentInDb() {
   }
   try {
     const dbResult = await updateContent(table, updateID, content, done);
-    console.log('Päivitys alkaapi tästä');
+    console.log('Updating content');
   } catch (err) {
-    console.log(err + ' funktio erroria');
+    console.log(err);
   } finally {
     readAllContent();
     readAllDoneContent();
@@ -139,7 +109,7 @@ async function refresh(){
   done=0;
   console.log(done);
   try {
-    console.log("app 44");
+    console.log("Refreshing list");
     const dbResult = await refreshDone(table, done);
     console.log('dbResult: ' + dbResult); 
   } catch (err) {
@@ -156,7 +126,7 @@ async function setAllDone(){
   done=1;
   console.log(done);
   try {
-    console.log("app 44");
+    console.log("Setting all items done.");
     const dbResult = await refreshDone(table, done);
     console.log('dbResult: ' + dbResult); 
   } catch (err) {
@@ -169,33 +139,31 @@ async function setAllDone(){
   }
 }
 
-  async function setItemDone(id) {
-    done = 1;
+async function setItemDone(id) {
+  console.log(done);
+  done = 1;
+  console.log(done);
+  try {
+    console.log('Setting an item done.');
     console.log(done);
-    try {
-      console.log('app 44');
-      console.log(done);
-      const dbResult = await checkItemDone(table, done, itemList[id].id);
-      console.log(itemList[id].id);
-      console.log('dbResult: ' + dbResult);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      done = 0;
-      readAllContent();
-      readAllDoneContent();
-    }
-  }
+  const dbResult = await checkItemDone(table, done, itemList[id].id);
+  console.log(itemList[id].id);
+  console.log('dbResult: ' + dbResult); 
+} catch (err) {
+  console.log(err);
+} finally {
+  done=0;
+  readAllContent();
+  readAllDoneContent();
+  closeRow();
+}
+}
 
 async function setItemNotDone(id){
-  console.log(done);
   done=0;
   console.log(done + "set item not done");
   try {
-    console.log("app 159");
-    console.log(done);
     const dbResult = await checkItemDone(table, done, doneItemList[id].id); //using the same db method as setItemDone
-    console.log(itemList[id].id);
     console.log('dbResult: ' + dbResult); 
   } catch (err) {
     console.log(err);
@@ -209,7 +177,6 @@ async function setItemNotDone(id){
   async function readAllContent(id) {
     try {
       const dbResult = await fetchAllContent(table);
-      console.log('dbResult readAllContent in GymScreen.js');
       console.log(dbResult);
       setItemList(dbResult);
     } catch (err) {
@@ -222,23 +189,21 @@ async function setItemNotDone(id){
   async function readAllDoneContent() {
     try {
       const dbResult = await fetchAllDoneContent(table);
-      console.log('dbResult readAllDoneContent in GymScreen.js');
       console.log(dbResult);
       setDoneItemList(dbResult);
     } catch (err) {
-      console.log('Erroria pukkaa done: ' + err);
+      console.log(err);
     } finally {
       console.log('All read');
     }
   }
 
-
 const renderContent = ({item, index}) => {
   return (
     <Swipeable renderRightActions={()=>renderRightActions(item.id)}
-    onSwipeableWillOpen={() => closeRow(index)}
+      onSwipeableWillOpen={() => closeRow(index)}
       ref={(ref) => (row[index] = ref)}
-      rightOpenValue={-50}>  
+      rightOpenValue={-50}>
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => updateItem(index, item.content)}
@@ -254,20 +219,32 @@ const renderContent = ({item, index}) => {
   );
 };
 
-const renderContent2 = ({item, index}) => {
-  return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onLongPress={() => setItemNotDone(index, item.id)}
-        key={index}>
-        <View>
-          <Text style={styles.inputStyle}>
-          <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
-          </Text>
-        </View>
-      </TouchableOpacity>
-  );
-};
+  const renderContent2 = ({item, index}) => {
+    return (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onLongPress={() => setItemNotDone(index, item.id)}
+          key={index}>
+          <View>
+            <Text style={styles.inputStyle}>
+            <Icon name="check" style={styles.checkIcon} size={22}/>  {item.content}  
+            </Text>
+          </View>
+        </TouchableOpacity>
+    );
+  };
+
+  const renderRightActions = id => {
+    return (
+      <View style={styles.swipedRow}>
+        <Animated.View style={[styles.deleteButton]}>
+          <TouchableOpacity onPress={() => deleteItem(id)} key={id}>
+            <Text style={styles.deleteButtonText}><Icon name="trash" size={50} color="linen" /></Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -318,6 +295,6 @@ const renderContent2 = ({item, index}) => {
       </View>
     </View>
   );
-}
+  }
 
 export default GroceriesScreen;
