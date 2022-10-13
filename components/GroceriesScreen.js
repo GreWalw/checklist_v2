@@ -27,12 +27,21 @@ function GroceriesScreen({navigation}) {
   const [itemList, setItemList] = useState([]);
   const [doneItemList, setDoneItemList] = useState([]);
   const [updateID, setUpdateId] = useState(-1);
+  const [counter, setCounterTrue]=useState(false);
 
   let row: Array<any> = [];
   let prevOpenedRow;
 
-  readAllContent();
-  readAllDoneContent();
+  counterHandler();
+  
+    
+  function counterHandler(){
+    if(!counter){
+      readAllContent();
+      readAllDoneContent();
+      setCounterTrue(true);
+    }
+  }
   
   const contentInputHandler = enteredText => {
     setContent(enteredText);
