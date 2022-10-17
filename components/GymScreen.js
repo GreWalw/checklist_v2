@@ -263,17 +263,18 @@ const renderContent = ({item, index}) => {
         <TextInput
           style={styles.inputFieldStyle}
           placeholder="Add to list here"
+          placeholderTextColor="#525252"
           onChangeText={contentInputHandler}
           value={content}
         />
         <TouchableHighlight onPress={() => {}}>
           <View>
-            <Icon name="plus" size={50} onPress={() => sendContent()} />
+            <Icon name="plus" color="grey" size={50} onPress={() => sendContent()} />
           </View>
         </TouchableHighlight>
         <TouchableHighlight onPress={() => {}}>
           <View>
-            <Icon name="pencil" size={50} onPress={() => updateContentInDb()} />
+            <Icon name="pencil" color="grey" size={50} onPress={() => updateContentInDb()} />
           </View>
         </TouchableHighlight>
       </View>
@@ -296,12 +297,12 @@ const renderContent = ({item, index}) => {
         <TouchableOpacity 
           style={styles.massButton} 
           onPress={() => refresh()}>
-          <Text>Refresh all</Text>
+          <Text style={styles.fontColorButtons}>Refresh all</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.massButton}
           onPress={() => setAllDone()}>
-          <Text>All done</Text>
+          <Text style={styles.fontColorButtons}>All done</Text>
         </TouchableOpacity>
       </View>
     </View>
